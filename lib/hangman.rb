@@ -4,7 +4,7 @@ require 'json'
 class Start
 #METHOD TO START PROGRAM
   def self.program()
-    puts "Would you like to start a new $game (1) or load a save file (2)?"
+    puts "Would you like to start a new game (1) or load a save file (2)?"
     answer = gets.chomp
     puts answer
 
@@ -41,18 +41,29 @@ class Hangman
   attr_accessor :attempts, :guesses
 
 #STARTING A NEW GAME
-  def initialize(name = "", attempts = 10, guesses = [], word = new_word())
+  def initialize(name = "", guesses = [], word = new_word(), attempts = word.length * 2)
     @name = name
-    @attempts = attempts
     @guesses = guesses
     @word = {"word" => word, 
              "guessing" => {"hidden word" => word.split("").map { |letter| letter = "_ " }.join(""), 
                             "guesses" => @guesses
             }} 
+    @attempts = attempts
   end
 
-  def new_word
-    "plain"
+  def new_word()
+    word_file = File.open("wordlist.txt")
+    dictionary = word_file.readlines.map(&:chomp)
+    word_file.close
+    
+    valid_word = false
+    while valid_word == false
+      word = dictionary[rand((dictionary.length() -1))]
+      word[0].match?(/[a-z]/) && word.length > 4 && word.length < 12 
+      ? valid_word = true 
+      : valid_word = false 
+    end
+    word
   end
 
 #PLAYING THE GAME
